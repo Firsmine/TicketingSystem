@@ -25,6 +25,11 @@ class User extends Authenticatable
         'password'
     ];
 
+    public function booking()
+    {
+        return $this->hasMany(Booking::class, 'user_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -3,42 +3,60 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Auth;
 use Hash;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $data = $request->validate([
+        $data = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6'
         ]);
 
-        $user = User::create($data);
+        if ($data->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request data',
+                'errors' => $data->errors()
+            ], 422);
+        }
+
+        $user = User::create($data->validated());
         $token = $user->createToken('auth_token')->plainTextToken;
 
         return response()->json([
             'status' => 'success',
             'message' => 'Registration successful',
             'data' => array_merge($user->toArray(), ['token' => $token])
-        ]);
+        ], 201);
     }
 
     public function login(Request $request)
     {
-        $request->validate([
+        $data = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
-            'password' => 'required|string',
+            'password' => 'required|string'
         ]);
+
+        if ($data->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Invalid request data',
+                'errors' => $data->errors()
+            ], 422);
+        }
 
         $user = User::where('email', $request->email)->first();
         if (!$user || !Hash::check($request->password, $user->password)) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'Email or password incorrect'
-            ]);
+            ], 401);
         }
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -46,15 +64,21 @@ class AuthController extends Controller
             'status' => 'success',
             'message' => 'Logged in successfully',
             'data' => array_merge($user->toArray(), ['token' => $token])
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request)
     {
+        if (!Auth::user()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Authentication required'
+            ], 401);
+        }
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'status' => 'success',
             'message' => 'Logged out successfully'
-        ]);
+        ], 200);
     }
 }
