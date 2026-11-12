@@ -13,13 +13,21 @@ class Fixture extends Model
         'away_team_id',
         'stadium_id'
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function stadium()
     {
         return $this->belongsTo(Stadium::class, 'stadium_id');
     }
-    public function team()
+    public function homeTeam()
     {
-        return $this->belongsTo(Team::class);
+        return $this->belongsTo(Team::class, 'home_team_id');
+    }
+    public function awayTeam()
+    {
+        return $this->belongsTo(Team::class, 'away_team_id');
     }
     public function fixtureTicket()
     {

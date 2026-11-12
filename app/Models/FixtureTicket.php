@@ -14,6 +14,10 @@ class FixtureTicket extends Model
         'quota',
         'remaining_quota'
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function booking()
     {
         return $this->hasMany(Booking::class, 'fixture_ticket_id');
@@ -22,7 +26,7 @@ class FixtureTicket extends Model
     {
         return $this->belongsTo(Fixture::class, 'fixture_id');
     }
-    public function stadium_section()
+    public function stadiumSection()
     {
         return $this->belongsTo(StadiumSection::class, 'stadium_section_id');
     }

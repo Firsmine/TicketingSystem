@@ -69,12 +69,6 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        if (!Auth::user()) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Authentication required'
-            ], 401);
-        }
         $request->user()->currentAccessToken()->delete();
         return response()->json([
             'status' => 'success',

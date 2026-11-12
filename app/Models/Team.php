@@ -11,6 +11,10 @@ class Team extends Model
         'code',
         'flag'
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function fixture()
     {
         return $this->hasMany(Fixture::class);

@@ -11,7 +11,10 @@ class Stadium extends Model
         'city',
         'capacity'
     ];
-
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function stadiumSection()
     {
         return $this->hasMany(StadiumSection::class, 'stadium_id');

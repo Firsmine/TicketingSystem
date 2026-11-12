@@ -11,6 +11,10 @@ class StadiumSection extends Model
         'name',
         'capacity',
     ];
+    protected $hidden = [
+        'created_at',
+        'updated_at'
+    ];
     public function fixtureTicket()
     {
         return $this->hasMany(FixtureTicket::class, 'stadium_section_id');
