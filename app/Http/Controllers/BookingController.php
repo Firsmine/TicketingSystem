@@ -39,6 +39,7 @@ class BookingController extends Controller
                 'errors' => $data->errors()
             ], 422);
         }
+        $data = $data->validated();
 
         $booking = DB::transaction(function () use ($request, $data) {
             $ticket = FixtureTicket::where('id', $data['fixture_ticket_id'])->lockForUpdate()->first();
@@ -48,7 +49,7 @@ class BookingController extends Controller
             }
 
             $subtotal = $ticket->price * $data['quantity'];
-            $serviceFee = $subtotal * 0.5;
+            $serviceFee = $subtotal * 0.05;
             $totalAmount = $subtotal + $serviceFee;
 
             $booking = Booking::create([
@@ -66,7 +67,7 @@ class BookingController extends Controller
             $booking->booking_reference = 'BK-' . $booking->created_at->format('ymd') . '-' . str_pad($booking->id, 4, '0', STR_PAD_LEFT);
             $booking->save();
 
-            $ticket->decrement('remaining_quota', data['quantity']);
+            $ticket->decrement('remaining_quota', $data['quantity']);
             return $booking;
         });
 
@@ -96,7 +97,7 @@ class BookingController extends Controller
         ]);
     }
 
-    public function payment(Request $request, string $id)
+    public function payment(Request $request)
     {
         $data = $request->validate([
             'booking_reference' => 'required|string|exists:bookings,booking_reference',
